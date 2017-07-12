@@ -185,8 +185,28 @@ public class UPAEditorWindow : EditorWindow {
 		
 		// TODO: Better way of doing this?
 		// Why does it behave so weirdly with my mac tablet.
+		//OLD:
+		/*
 		if (e.type == EventType.scrollWheel) {
-			gridSpacing -= e.delta.y;
+			
+			gridSpacing -= e.delta.y > 5f ? 5f*direction : e.delta.y;
+			
+		}
+		*/
+		//NOTE(tjk): The reason for the odd zooming behavior has to do with the value of e.delta.y itself
+		//           it turns out that it seems to have a weird 'snap back in other direction' behavior when zooming out
+		//	     going forward it seems to behave relatively okay. The fix here is to simply clamp
+		//           our zoom ability so that we only listen for when the gesture is above a certain threshold
+		//	     If so, then we also check if it has exceeded a maximum move threshold and clamp zoom action that way
+		//           currently the min and max thresholds are hard coded as 1f and 5f respectively.
+		//            It may still not be perfect, but its behavior is more consistent than before.
+		if (e.type == EventType.scrollWheel) {
+			Debug.Log(e.delta.y);
+			if(Mathf.Abs(e.delta.y) > 1f)
+			{
+				var direction = Mathf.Sign(e.delta.y);
+				gridSpacing -= e.delta.y > 5f ? 5f*direction : e.delta.y;
+			}
 		}
 		#endregion
 		
